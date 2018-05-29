@@ -89,7 +89,7 @@ int main()
           		iss >> timestamp;
           		meas_package.timestamp_ = timestamp;
           }
-          float x_gt;
+        float x_gt;
     	  float y_gt;
     	  float vx_gt;
     	  float vy_gt;
@@ -111,10 +111,10 @@ int main()
 
     	  VectorXd estimate(4);
 
-    	  double p_x = fusionEKF.ekf_.x_(0);
-    	  double p_y = fusionEKF.ekf_.x_(1);
-    	  double v1  = fusionEKF.ekf_.x_(2);
-    	  double v2 = fusionEKF.ekf_.x_(3);
+    	  float p_x = fusionEKF.ekf_.x_(0);
+    	  float p_y = fusionEKF.ekf_.x_(1);
+    	  float v1  = fusionEKF.ekf_.x_(2);
+    	  float v2 = fusionEKF.ekf_.x_(3);
 
     	  estimate(0) = p_x;
     	  estimate(1) = p_y;

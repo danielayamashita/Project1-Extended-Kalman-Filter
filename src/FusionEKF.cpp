@@ -42,16 +42,13 @@ FusionEKF::FusionEKF() {
   noise_ay = 9;
   //the initial transition matrix F_
 	ekf_.F_ = MatrixXd(4, 4);
-	ekf_.F_ << 1, 0, 1, 0,
-			  0, 1, 0, 1,
-			  0, 0, 1, 0,
-			  0, 0, 0, 1;
+
   //the initial transition matrix P_
 	ekf_.P_ = MatrixXd(4, 4);
 	ekf_.P_ << 1, 0, 0, 0,
-			  0, 1, 0, 0,
-			  0, 0, 1000, 0,
-			  0, 0, 0, 1000;
+			       0, 1, 0, 0,
+			       0, 0, 1000, 0,
+			       0, 0, 0, 1000;
   
   H_laser_ << 1, 0, 0, 0,
               0, 1, 0, 0;
@@ -85,19 +82,20 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       /**
       Convert radar from polar to cartesian coordinates and initialize state.
       */
-      ekf_.Init(ekf_.x_,ekf_.P_,ekf_.F_,ekf_.H_,R_radar_,ekf_.Q_);
+      //ekf_.Init(ekf_.x_,ekf_.P_,ekf_.F_,ekf_.H_,R_radar_,ekf_.Q_);
       ekf_.x_(0) = measurement_pack.raw_measurements_[0]*cos(measurement_pack.raw_measurements_[1]);
       ekf_.x_(1) = measurement_pack.raw_measurements_[0]*sin(measurement_pack.raw_measurements_[1]);
 
       ekf_.x_(2) =  measurement_pack.raw_measurements_[2]*cos(measurement_pack.raw_measurements_[1]);
       ekf_.x_(3) =  measurement_pack.raw_measurements_[2]*sin(measurement_pack.raw_measurements_[1]);
-      if(ekf_.x_(0) <0.0001)
+
+      if(ekf_.x_(0) <0.00001)
       {
-        ekf_.x_(0) = 0.0001;
+        ekf_.x_(0) = 0.00001;
       }
-      if(ekf_.x_(1) <0.0001)
+      if(ekf_.x_(1) <0.00001)
       {
-        ekf_.x_(1) = 0.0001;
+        ekf_.x_(1) = 0.00001;
       }
 
       #ifdef PRINT_HEADERS_H_
@@ -111,7 +109,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       /**
       Initialize state.
       */
-     ekf_.Init(ekf_.x_,ekf_.P_,ekf_.F_,ekf_.H_,R_laser_,ekf_.Q_);
+     //ekf_.Init(ekf_.x_,ekf_.P_,ekf_.F_,ekf_.H_,R_laser_,ekf_.Q_);
      ekf_.x_<< measurement_pack.raw_measurements_[0], measurement_pack.raw_measurements_[1], 0, 0;
      #ifdef PRINT_HEADERS_H_
      std::cout << "--------------------------------------" << std::endl;
@@ -142,9 +140,12 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   #ifdef PRINT_H_
   std::cout << "dt:" <<  dt << std::endl;
   #endif
-
-  ekf_.F_(0,2) = dt;
-  ekf_.F_(1,3) = dt;
+	ekf_.F_ << 1, 0, dt, 0,
+			       0, 1, 0, dt,
+			       0, 0, 1, 0,
+			       0, 0, 0, 1;
+  //ekf_.F_(0,2) = dt;
+  //ekf_.F_(1,3) = dt;
 
   float dt_4;
 	float dt_3;
@@ -183,11 +184,13 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     // Radar update
     ekf_.R_ = R_radar_;
     ekf_.H_ = tools.CalculateJacobian(ekf_.x_);
+    //ekf_.Init(ekf_.x_,ekf_.P_,ekf_.F_,ekf_.H_,R_radar_,ekf_.Q_);
     ekf_.UpdateEKF(measurement_pack.raw_measurements_);
   } else {
     // Laser updates
     ekf_.R_ = R_laser_;
     ekf_.H_ = H_laser_;
+    //ekf_.Init(ekf_.x_,ekf_.P_,ekf_.F_,ekf_.H_,R_laser_,ekf_.Q_);
     ekf_.Update(measurement_pack.raw_measurements_);
   }
 

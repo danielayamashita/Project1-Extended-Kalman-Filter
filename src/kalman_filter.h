@@ -2,9 +2,9 @@
 #define KALMAN_FILTER_H_
 
 //#define PRINT_H_
-#define PRINT_OUTPUTS_H_
+//#define PRINT_OUTPUTS_H_
 //#define PRINT_HEADERS_H_
-#//define PRINT_ERRORS_H_
+//#define PRINT_ERRORS_H_
 #include "Eigen/Dense"
 
 class KalmanFilter {
@@ -28,7 +28,6 @@ public:
   // measurement covariance matrix
   Eigen::MatrixXd R_;
 
-  Eigen::MatrixXd I; // Identity matrix
   /**
    * Constructor
    */

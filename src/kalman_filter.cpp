@@ -37,7 +37,7 @@ void KalmanFilter::Predict() {
   std::cout << "P_:" <<P_<< std::endl << std::endl;
   std::cout << "Q_:" <<Q_<< std::endl << std::endl;
   #endif //PRINT_H_
-  x_ = F_*x_;
+  x_ = F_ * x_;
   MatrixXd Ft = F_.transpose();
   P_= F_*P_*Ft + Q_;
   #ifdef PRINT_H_
@@ -51,7 +51,7 @@ void KalmanFilter::Update(const VectorXd &z) {
     * update the state by using Kalman Filter equations
   */
   
-  I = MatrixXd::Identity(x_.size(), x_.size());
+  MatrixXd I = MatrixXd::Identity(x_.size(), x_.size());
   VectorXd y = z - H_ * x_; 
   MatrixXd Ht = H_.transpose();
   MatrixXd S = H_ * P_ * Ht + R_;
@@ -92,19 +92,25 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   
 
 
-  double px = x_(0);
-  double py = x_(1);
-  double vx = x_(2);
-  double vy = x_(3);
+  float px = x_(0);
+  float py = x_(1);
+  float vx = x_(2);
+  float vy = x_(3);
 
-  double rho = sqrt(px*px + py*py);
-  double theta = atan2(py, px);
-  double rho_dot = (px*vx + py*vy) / rho;
 
+  float rho = sqrt(px*px + py*py);
+  float theta = atan2(py, px);
+  float rho_dot = (px*vx + py*vy) / rho;
+
+  if ((fabs(px)<0.0001) || (fabs(py)<0.0001))
+  {
+    theta = 0;
+    rho_dot = 0;
+  }
   h << rho, theta, rho_dot;
 
   
-  I = MatrixXd::Identity(x_.size(), x_.size());
+  MatrixXd I = MatrixXd::Identity(x_.size(), x_.size());
   VectorXd y = z - h;
   
   while ( y(1) > M_PI || y(1) < -M_PI ) 
